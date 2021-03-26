@@ -344,13 +344,13 @@ class CSP:
         '''return list of constraints that include var in their scope'''
         return list(self.vars_to_cons[var])
 
-    def get_all_vars(self):
-        '''return list of variables in the CSP'''
-        return list(self.vars)
-
     def get_all_unasgn_vars(self):
         '''return list of unassigned variables in the CSP'''
         return [v for v in self.vars if not v.is_assigned()]
+
+    def get_all_vars(self):
+        '''return list of variables in the CSP'''
+        return list(self.vars)
 
     def print_all(self):
         print("CSP", self.name)
@@ -425,40 +425,8 @@ class BT:
         self.unasgn_vars.append(var)
         
     def bt_search(self,propagator,var_ord=None,val_ord=None):
-        '''Try to solve the CSP using specified propagator routine
-
-           propagator == a function with the following template
-           propagator(csp, newly_instantiated_variable=None)
-           ==> returns (True/False, [(Variable, Value), (Variable, Value) ...]
-
-           csp is a CSP object---the propagator can use this to get access
-           to the variables and constraints of the problem.
-
-           newly_instaniated_variable is an optional argument. 
-           if newly_instantiated_variable is not None:
-               then newly_instantiated_variable is the most
-               recently assigned variable of the search.
-           else:
-               progator is called before any assignments are made
-               in which case it must decide what processing to do
-               prior to any variables being assigned.
-
-           The propagator returns True/False and a list of (Variable, Value) pairs.
-           Return is False if a deadend has been detected by the propagator.
-             in this case bt_search will backtrack
-           return is true if we can continue.
-
-           The list of variable values pairs are all of the values
-           the propagator pruned (using the variable's prune_value method). 
-           bt_search NEEDS to know this in order to correctly restore these 
-           values when it undoes a variable assignment.
-
-           NOTE propagator SHOULD NOT prune a value that has already been 
-           pruned! Nor should it prune a value twice
-
-           var_ord is the variable ordering function currently being used; 
-           val_ord is the value ordering function currently being used.
-           '''
+        '''Return true if found solution. False if still need to search.
+           If top level returns false--> no solution'''
 
         self.clear_stats()
         stime = time.process_time()
@@ -482,6 +450,7 @@ class BT:
                 self.csp.name))
         else:
             status = self.bt_recurse(propagator, var_ord, val_ord, 1)   #now do recursive search
+
 
         self.restoreValues(prunings)
         if status == False:
@@ -547,4 +516,5 @@ class BT:
 
             self.restoreUnasgnVar(var)
             return False
+
 

@@ -184,19 +184,19 @@ def tenner_csp_model_2(initial_tenner_board):
 
     # Create n-ary row constraints
     for i in range(num_rows):
-        possible_dom = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         scope = []
+        possible_dom = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         # Check var values to identify scope
         for j in range(num_cols):
-            if n_grid == -1:
-                scope.append(var_grid[i][j])
+            if n_grid[i][j] == -1:
+                scope.append(n_grid[i][j])
             else:
                 possible_dom.remove(n_grid[i][j])
+
         row_cons = Constraint("c", scope)
         valid_set = []
-        # Add all possible value sets to constraint satisfications
-        for var_set in itertools.permutations(possible_dom):
-            valid_set.append(var_set)
+        for perm in itertools.permutations(possible_dom):
+            valid_set.append(perm)
         row_cons.add_satisfying_tuples(valid_set)
         all_cons.append(row_cons)
 
